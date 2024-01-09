@@ -30,6 +30,12 @@ pub fn validate_commit_message(commit_message: &str) -> Result<ValidateCommitRes
     if commit_message.starts_with("feat(") && commit_message.contains("):") {
         return Ok(ValidateCommitResult::Minor);
     }
+    if commit_message.starts_with("fix:") {
+        return Ok(ValidateCommitResult::Patch);
+    }
+    if commit_message.starts_with("fix(") && commit_message.contains("):") {
+        return Ok(ValidateCommitResult::Patch);
+    }
 
     Ok(ValidateCommitResult::None)
 }
@@ -112,5 +118,14 @@ BREAKING CHANGE: some information about this breaking change"
         let result = validate_commit_message(commit_message);
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ValidateCommitResult::Minor);
+    }
+
+    #[rstest]
+    #[case("fix: fix a bug")]
+    #[case("fix(scoped): fix a scoped bug")]
+    fn assert_commit_message_is_patch_change(#[case] commit_message: &str) {
+        let result = validate_commit_message(commit_message);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), ValidateCommitResult::Patch);
     }
 }
