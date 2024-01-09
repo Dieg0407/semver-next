@@ -2,6 +2,7 @@ const VALID_STARTS: [&'static str; 10] = [
     "feat", "fix", "docs", "style", "build", "refactor", "perf", "test", "chore", "revert",
 ];
 
+#[derive(Debug, PartialEq)]
 pub enum ValidateCommitResult {
     Major,
     Minor,
@@ -22,6 +23,12 @@ pub fn validate_commit_message(commit_message: &str) -> Result<ValidateCommitRes
     }
     if commit_message.starts_with("feat(") && commit_message.contains(")!:") {
         return Ok(ValidateCommitResult::Major);
+    }
+    if commit_message.starts_with("feat:") {
+        return Ok(ValidateCommitResult::Minor);
+    }
+    if commit_message.starts_with("feat(") && commit_message.contains("):") {
+        return Ok(ValidateCommitResult::Minor);
     }
 
     Ok(ValidateCommitResult::None)
@@ -95,5 +102,15 @@ BREAKING CHANGE: some information about this breaking change"
     fn assert_commit_message_is_major_change(#[case] commit_message: &str) {
         let result = validate_commit_message(commit_message);
         assert!(result.is_ok());
+        assert_eq!(result.unwrap(), ValidateCommitResult::Major);
+    }
+
+    #[rstest]
+    #[case("feat: add new feature")]
+    #[case("feat(scoped): new scoped feature")]
+    fn assert_commit_message_is_minor_change(#[case] commit_message: &str) {
+        let result = validate_commit_message(commit_message);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), ValidateCommitResult::Minor);
     }
 }
