@@ -1,6 +1,12 @@
-pub fn generate_version(commit_message: String, last_version: String) -> String {
-    println!("Commit message: {commit_message}");
-    println!("Last semantic version: {last_version}");
+mod semver_validator;
 
-    last_version
+use semver_validator::validate_semver;
+
+pub fn generate_version(commit_message: String, last_version: String) -> Result<String, String> {
+    eprintln!("Commit message: {commit_message}");
+    eprintln!("Last semantic version: {last_version}");
+
+    validate_semver(&last_version)?;
+
+    Ok(last_version)
 }

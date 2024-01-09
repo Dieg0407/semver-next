@@ -11,11 +11,13 @@ struct Arguments {
     last_version: String,
 }
 
-fn main() {
+fn main() -> Result<(), String> {
     let Arguments {
         commit_message,
         last_version,
     } = Arguments::parse();
-    let new_version = generate_version(commit_message, last_version);
+    let new_version = generate_version(commit_message, last_version)?;
     println!("{new_version}");
+
+    Ok(())
 }
