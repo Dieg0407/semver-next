@@ -3,41 +3,41 @@ const VALID_STARTS: [&'static str; 10] = [
 ];
 
 #[derive(Debug, PartialEq)]
-pub enum ValidateCommitResult {
+pub enum VersionChangeType {
     Major,
     Minor,
     Patch,
     None,
 }
 
-pub fn validate_commit_message(commit_message: &str) -> Result<ValidateCommitResult, String> {
+pub fn validate_commit_message(commit_message: &str) -> Result<VersionChangeType, String> {
     if !commit_message_is_formated(&commit_message) {
         return Err("Commit message does not start with a valid type".to_string());
     }
 
     if commit_message.contains("BREAKING CHANGE") {
-        return Ok(ValidateCommitResult::Major);
+        return Ok(VersionChangeType::Major);
     }
     if commit_message.starts_with("feat!:") {
-        return Ok(ValidateCommitResult::Major);
+        return Ok(VersionChangeType::Major);
     }
     if commit_message.starts_with("feat(") && commit_message.contains(")!:") {
-        return Ok(ValidateCommitResult::Major);
+        return Ok(VersionChangeType::Major);
     }
     if commit_message.starts_with("feat:") {
-        return Ok(ValidateCommitResult::Minor);
+        return Ok(VersionChangeType::Minor);
     }
     if commit_message.starts_with("feat(") && commit_message.contains("):") {
-        return Ok(ValidateCommitResult::Minor);
+        return Ok(VersionChangeType::Minor);
     }
     if commit_message.starts_with("fix:") {
-        return Ok(ValidateCommitResult::Patch);
+        return Ok(VersionChangeType::Patch);
     }
     if commit_message.starts_with("fix(") && commit_message.contains("):") {
-        return Ok(ValidateCommitResult::Patch);
+        return Ok(VersionChangeType::Patch);
     }
 
-    Ok(ValidateCommitResult::None)
+    Ok(VersionChangeType::None)
 }
 
 fn commit_message_is_formated(commit_message: &str) -> bool {
@@ -108,7 +108,7 @@ BREAKING CHANGE: some information about this breaking change"
     fn assert_commit_message_is_major_change(#[case] commit_message: &str) {
         let result = validate_commit_message(commit_message);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ValidateCommitResult::Major);
+        assert_eq!(result.unwrap(), VersionChangeType::Major);
     }
 
     #[rstest]
@@ -117,7 +117,7 @@ BREAKING CHANGE: some information about this breaking change"
     fn assert_commit_message_is_minor_change(#[case] commit_message: &str) {
         let result = validate_commit_message(commit_message);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ValidateCommitResult::Minor);
+        assert_eq!(result.unwrap(), VersionChangeType::Minor);
     }
 
     #[rstest]
@@ -126,6 +126,6 @@ BREAKING CHANGE: some information about this breaking change"
     fn assert_commit_message_is_patch_change(#[case] commit_message: &str) {
         let result = validate_commit_message(commit_message);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ValidateCommitResult::Patch);
+        assert_eq!(result.unwrap(), VersionChangeType::Patch);
     }
 }
