@@ -12,7 +12,7 @@ pub enum VersionChangeType {
 
 pub fn validate_commit_message(commit_message: &str) -> Result<VersionChangeType, String> {
     if !commit_message_is_formated(&commit_message) {
-        return Err("Commit message does not start with a valid type".to_string());
+        return Err("Commit message does not start with a valid type. For example 'feat: some random commit'".to_string());
     }
 
     if commit_message.contains("BREAKING CHANGE") {
