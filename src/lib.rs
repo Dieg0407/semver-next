@@ -1,7 +1,7 @@
 mod commit_message_validator;
 mod semver_validator;
 
-use commit_message_validator::validate_commit_message;
+pub use commit_message_validator::validate_commit_message;
 use commit_message_validator::VersionChangeType;
 use semver_validator::validate_semver;
 

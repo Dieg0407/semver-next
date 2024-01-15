@@ -1,23 +1,50 @@
-use clap::Parser;
-use semver_next::generate_version;
+use clap::{Parser, Subcommand};
+use semver::generate_version;
+use semver::validate_commit_message;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
-struct Arguments {
-    #[arg(short, long)]
-    commit_message: String,
+#[command(propagate_version = true)]
+struct Cli {
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
 
-    #[arg(short, long)]
-    last_version: String,
+#[derive(Subcommand, Debug)]
+enum Commands {
+    Next {
+        #[arg(short, long)]
+        commit_message: String,
+        #[arg(short, long)]
+        last_version: String,
+    },
+    Validate {
+        #[arg(short, long)]
+        commit_message: String,
+    },
 }
 
 fn main() -> Result<(), String> {
-    let Arguments {
-        commit_message,
-        last_version,
-    } = Arguments::parse();
-    let new_version = generate_version(commit_message, last_version)?;
-    println!("{new_version}");
+    let cli = Cli::parse();
+    match cli.command {
+        Some(Commands::Next {
+            commit_message,
+            last_version,
+        }) => {
+            let new_version = generate_version(commit_message, last_version)?;
+            println!("{new_version}");
+        }
+        Some(Commands::Validate { commit_message }) => {
+            let result = validate_commit_message(&commit_message);
+            if result.is_err() {
+                eprintln!("{}", result.err().unwrap());
+                println!("invalid");
+            } else {
+                println!("valid");
+            }
+        }
+        None => (),
+    }
 
     Ok(())
 }

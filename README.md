@@ -13,10 +13,30 @@ like the ones intalled with husky.
 1. Run cargo build -r
 2. Copy the executable from the `target/release` into your path.
 
-## Usage
+## Supported commands
+
+### Next
+
+This command will generate the next semantic version based on a commit message and a last sem version
+that contains only numeric parts.
 
 ```bash
-next_version=$(semver-next --commit-message "feat: some commit message" --last-version "1.2.3"`)
+#!/bin/sh
+next_version=$(semver next --commit-message "feat: some commit message" --last-version "1.2.3"`)
 echo $next_version
+```
 
+### Validate
+
+This command is extracted from the one above, the difference radicate in that this one will not fail
+in case the commit message is invalid. Instead it will print 'valid' or 'invalid' without the quotes 
+depending on the message
+
+```bash
+#!/bin/sh
+valid=$(semver validate --commit-message "feat: message to be validated")
+echo $valid # will print 'valid'
+
+invalid=$(semver validate --commit-message "incorrect message")
+echo $invalid # will print 'invalid'
 ```
